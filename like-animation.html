@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>点赞动画</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', sans-serif;
+        }
+
+        .like-container {
+            text-align: center;
+            perspective: 1000px;
+        }
+
+        .like-button {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            background: #fff;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .like-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .like-button.liked {
+            background: #ff4757;
+            animation: pulse 0.5s ease;
+        }
+
+        .heart {
+            width: 40px;
+            height: 40px;
+            position: relative;
+            transform: rotate(45deg);
+            transition: all 0.3s ease;
+        }
+
+        .heart::before,
+        .heart::after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ff4757;
+            transition: all 0.3s ease;
+        }
+
+        .heart::before {
+            top: -20px;
+            left: 0;
+        }
+
+        .heart::after {
+            top: 0;
+            left: -20px;
+        }
+
+        .like-button.liked .heart::before,
+        .like-button.liked .heart::after {
+            background: #fff;
+        }
+
+        .like-count {
+            margin-top: 20px;
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .particles {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ff4757;
+            animation: float 1.5s ease-out forwards;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes float {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) scale(0);
+            }
+        }
+
+        .bounce {
+            animation: bounce 0.6s ease;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 60%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            80% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="like-container">
+        <button class="like-button" id="likeBtn">
+            <div class="heart"></div>
+        </button>
+        <div class="like-count" id="likeCount">0</div>
+        <div class="particles" id="particles"></div>
+    </div>
+
+    <script>
+        class LikeAnimation {
+            constructor() {
+                this.likeBtn = document.getElementById('likeBtn');
+                this.likeCount = document.getElementById('likeCount');
+                this.particlesContainer = document.getElementById('particles');
+                this.count = 0;
+                this.isLiked = false;
+                
+                this.init();
+            }
+
+            init() {
+                this.likeBtn.addEventListener('click', () => {
+                    this.handleLike();
+                });
+            }
+
+            handleLike() {
+                if (this.isLiked) {
+                    this.unlike();
+                } else {
+                    this.like();
+                }
+            }
+
+            like() {
+                this.isLiked = true;
+                this.count++;
+                this.updateUI();
+                this.createParticles();
+                this.animateButton();
+            }
+
+            unlike() {
+                this.isLiked = false;
+                this.count--;
+                this.updateUI();
+                this.animateButton();
+            }
+
+            updateUI() {
+                this.likeBtn.classList.toggle('liked', this.isLiked);
+                this.likeCount.textContent = this.count;
+                this.likeCount.classList.add('bounce');
+                setTimeout(() => {
+                    this.likeCount.classList.remove('bounce');
+                }, 600);
+            }
+
+            animateButton() {
+                this.likeBtn.style.animation = 'none';
+                setTimeout(() => {
+                    this.likeBtn.style.animation = 'pulse 0.5s ease';
+                }, 10);
+            }
+
+            createParticles() {
+                const particleCount = 12;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    
+                    const angle = (i / particleCount) * Math.PI * 2;
+                    const distance = 80 + Math.random() * 40;
+                    const tx = Math.cos(angle) * distance;
+                    const ty = Math.sin(angle) * distance;
+                    
+                    particle.style.setProperty('--tx', `${tx}px`);
+                    particle.style.setProperty('--ty', `${ty}px`);
+                    particle.style.animationDelay = `${Math.random() * 0.3}s`;
+                    
+                    this.particlesContainer.appendChild(particle);
+                    
+                    setTimeout(() => {
+                        particle.remove();
+                    }, 1500);
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new LikeAnimation();
+        });
+    </script>
+</body>
+</html>
