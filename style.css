@@ -1,0 +1,43 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+}
+
+.container {
+    text-align: center;
+}
+
+h1 {
+    color: #333;
+}
+
+.status {
+    margin: 20px 0;
+    font-size: 18px;
+}
+
+#board {
+    border: 2px solid #333;
+    background-color: #dcb35c;
+    cursor: pointer;
+}
+
+#reset-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#reset-btn:hover {
+    background-color: #45a049;
+}
